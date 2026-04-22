@@ -3,7 +3,7 @@
 
 
 -- QUERY 1 (JOIN)
--- What are the top 10 teams with the most wins from 2008 to 2016?
+-- What are the best 10 teams from 2008 to 2016?
 
 SELECT TOP 10
     t.team_long_name                                                        AS team,
