@@ -178,19 +178,22 @@ ORDER BY team_name, season;
 
 
 
--- QUERY 11 (JOIN)
--- Which leagues had the most total matches played?
-
+-- QUERY 11 -- GOAL 4: Which leagues produced the most dominant teams?
 SELECT
-    l.name AS league_name,
-    c.name AS country,
-    COUNT(*) AS total_matches
+    l.name                                                                  AS league,
+    c.name                                                                  AS country,
+    COUNT(DISTINCT t.team_api_id)                                           AS total_teams,
+    SUM(CASE WHEN m.home_team_goal > m.away_team_goal THEN 1 ELSE 0 END)   AS total_wins,
+    ROUND(
+        CAST(SUM(CASE WHEN m.home_team_goal > m.away_team_goal THEN 1 ELSE 0 END) AS FLOAT)
+        / NULLIF(COUNT(*), 0) * 100, 2
+    )                                                                       AS avg_win_pct
 FROM Match m
-JOIN League l ON m.league_id = l.id
-JOIN Country c ON m.country_id = c.id
+JOIN Team    t ON m.home_team_api_id = t.team_api_id
+JOIN League  l ON m.league_id        = l.id
+JOIN Country c ON m.country_id       = c.id
 GROUP BY l.name, c.name
-ORDER BY total_matches DESC;
-
+ORDER BY avg_win_pct DESC;
 
 
 -- QUERY 12 (JOIN + VIEW)
