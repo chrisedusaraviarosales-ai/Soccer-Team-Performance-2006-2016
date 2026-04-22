@@ -6,13 +6,20 @@
 -- What are the top 10 teams with the most wins from 2008 to 2016?
 
 SELECT TOP 10
-    t.team_long_name AS team_name,
-    COUNT(*) AS total_matches,
-    SUM(CASE WHEN m.home_team_goal > m.away_team_goal THEN 1 ELSE 0 END) AS total_wins
+    t.team_long_name                                                        AS team,
+    l.name                                                                  AS league,
+    COUNT(*)                                                                AS total_matches,
+    SUM(CASE WHEN m.home_team_goal > m.away_team_goal THEN 1 ELSE 0 END)   AS total_wins,
+    ROUND(
+        CAST(SUM(CASE WHEN m.home_team_goal > m.away_team_goal THEN 1 ELSE 0 END) AS FLOAT)
+        / NULLIF(COUNT(*), 0) * 100, 2
+    )                                                                       AS win_pct
 FROM Match m
-JOIN Team t ON m.home_team_api_id = t.team_api_id
-GROUP BY t.team_long_name
+JOIN Team   t ON m.home_team_api_id = t.team_api_id
+JOIN League l ON m.league_id        = l.id
+GROUP BY t.team_long_name, l.name
 ORDER BY total_wins DESC;
+
 
 
 
